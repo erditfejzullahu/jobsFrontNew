@@ -168,13 +168,13 @@
                           <div class="col-lg-12">
                             <div class="form-group mb-30"> 
                               <label class="font-sm color-text-mutted mb-10">Job title *</label>
-                              <input class="form-control" v-model="JobTitle" type="text" placeholder="e.g. Senior Product Designer">
+                              <input class="form-control" v-model="postJobData.JobTitle" type="text" placeholder="e.g. Senior Product Designer">
                             </div>
                           </div>
                           <div class="col-lg-12"> 
                             <div class="form-group mb-30"> 
                               <label class="font-sm color-text-mutted mb-10">Add your job description *</label>
-                              <textarea class="form-control" v-model="JobDescription" name="message" rows="8"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem id enim suscipit commodo nec in ante. Sed viverra vel leo vitae pharetra. Morbi viverra venenatis neque, eu porttitor diam blandit nec. Etiam et volutpat magna, id molestie quam. Vestibulum vel libero gravida, scelerisque arcu eu, maximus mi. Suspendisse eu dolor lobortis, posuere enim venenatis, posuere quam.
+                              <textarea class="form-control" v-model="postJobData.JobDescription" name="message" rows="8"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem id enim suscipit commodo nec in ante. Sed viverra vel leo vitae pharetra. Morbi viverra venenatis neque, eu porttitor diam blandit nec. Etiam et volutpat magna, id molestie quam. Vestibulum vel libero gravida, scelerisque arcu eu, maximus mi. Suspendisse eu dolor lobortis, posuere enim venenatis, posuere quam.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem id enim suscipit commodo nec in ante. Sed viverra vel leo vitae pharetra. Morbi viverra venenatis neque, eu porttitor diam blandit nec. Etiam et volutpat magna, id molestie quam. Vestibulum vel libero gravida, scelerisque arcu eu, maximus mi. Suspendisse eu dolor lobortis, posuere enim venenatis, posuere quam.</textarea>
                             </div>
@@ -182,36 +182,36 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem id enim susc
                           <div class="col-lg-6 col-md-6">
                             <div class="form-group mb-30"> 
                               <label class="font-sm color-text-mutted mb-10">Job location</label>
-                              <input class="form-control" type="text" v-model="JobDescription" placeholder="e.g. &quot;New York City&quot; or &quot;San Francisco”">
+                              <input class="form-control" type="text" v-model="postJobData.JobLocation" placeholder="e.g. &quot;New York City&quot; or &quot;San Francisco”">
                             </div>
                           </div>
                           <div class="col-lg-6 col-md-6">
                             <div class="form-group mb-30">
                               <label class="font-sm color-text-mutted mb-10">Salary</label>
-                              <input class="form-control" type="text" placeholder="$2200 - $2500">
+                              <input class="form-control" type="text" v-model="postJobData.JobSalary" placeholder="$2200 - $2500">
                             </div>
                           </div>
                           <div class="col-lg-6 col-md-6">
                             <div class="form-group mb-30">
                               <label class="font-sm color-text-mutted mb-10">Tags (optional) </label>
-                              <input class="form-control" type="text" placeholder="Figma, UI/UX, Sketch...">
+                              <input class="form-control" type="text" v-model="postJobData.JobTags" placeholder="Figma, UI/UX, Sketch...">
                             </div>
                           </div>
                           <div class="col-lg-6 col-md-6">
                             <div class="form-group mb-30">
                               <div class="box-upload">
                                 <div class="add-file-upload">
-                                  <input class="fileupload" type="file" name="file">
-                                </div><a class="btn btn-default">Upload File</a>
+                                  <input class="fileupload" ref="fileInput" @change="handleFile" type="file" name="file">
+                                </div><a class="btn btn-default" @click="$refs.fileInput.click()">Upload File</a>
                               </div>
                             </div>
                           </div>
                           <div class="col-lg-6 col-md-6">
-                            <div class="form-group mb-30 box-file-uploaded d-flex align-items-center"><span>Job_required.pdf</span><a class="btn btn-delete">Delete</a></div>
+                            <div class="form-group mb-30 box-file-uploaded d-flex align-items-center"><span v-if="file">{{ file.name }}</span><a class="btn btn-delete" @click="remFile">Delete</a></div>
                           </div>
                           <div class="col-lg-12"> 
                             <div class="form-group mt-10">
-                              <button class="btn btn-default btn-brand icon-tick">Post New Job</button>
+                              <button class="btn btn-default btn-brand icon-tick" @click="submitJob">Post New Job</button>
                             </div>
                           </div>
                         </div>
@@ -273,16 +273,57 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem id enim susc
 
 <script>
 
+import axios from 'axios';
+
 export default {
+
     name: 'PostJob',
     data() {
         return {
-            JobTitle: '',
-            JobDescription: '',
-            JobLocation: '',
-            JobSalary: '', 
-            JobTags: '', 
-            JobImg: '',
+            postJobData: {
+                JobTitle: '',
+                JobDescription: '',
+                JobLocation: '',
+                JobSalary: '',
+                JobTags: '',
+            },
+            file: null,
+        }
+    },
+    methods: {
+        submitJob() {
+            this.sendData();
+        },
+        sendData() {
+            const formData = new FormData();
+            formData.append('post_title', this.postJobData.JobTitle);
+            formData.append('post_content', this.postJobData.JobDescription);
+            formData.append('job_place', this.postJobData.JobLocation);
+            formData.append('job_salary', this.postJobData.JobSalary);
+            formData.append('post_tags', this.postJobData.JobTags);
+            formData.append('post_img', this.file);
+
+            axios.post('/api/posts', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+                .then(response => {
+                    console.log(response.data.message);
+                    // if(response.data.message === "Post created successfully"){
+                    //     location.reload();
+                    // }
+                })
+                .catch(error => {
+                    console.error('Error sending data:', error);
+                });
+        },
+        handleFile() {
+            // Get the selected file from the input
+            this.file = this.$refs.fileInput.files[0];
+        },
+        remFile() {
+            this.file = null;
         }
     }
 }

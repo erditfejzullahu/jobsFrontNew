@@ -10,7 +10,7 @@ import VueAxios from 'vue-axios';
 const app = createApp(App);
 
 app.use(VueAxios, axios);
-app.axios.defaults.baseURL = "https://localhost:8000/"
+app.axios.defaults.baseURL = "http://127.0.0.1:8000/"
 
 // app.use(store);
 app.use(router);
