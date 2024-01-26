@@ -23,7 +23,7 @@
             <ul> 
               <li>        <router-link to="/">Home </router-link></li>
               <li> <a href="http://wp.alithemes.com/html/jobbox/demos/page-about.html">About us </a></li>
-              <li> <a href="http://wp.alithemes.com/html/jobbox/demos/page-contact.html">Contact</a></li>
+              <li> <router-link to="/login">Login</router-link></li>
             </ul>
           </div>
           <div class="header-right">
