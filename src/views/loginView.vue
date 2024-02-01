@@ -34,8 +34,8 @@
                             <div class="form-group">
                                 <button class="btn btn-brand-1 hover-up w-100" type="submit" name="login">Login</button>
                             </div>
-                            <div class="text-muted text-center">Don't have an Account? <a href="page-signin.html">Sign
-                                    up</a></div>
+                            <div class="text-muted text-center">Don't have an Account? <router-link to="/dashboard/register">Sign
+                                    up</router-link></div>
                         </form>
                     </div>
                     <div class="img-1 d-none d-lg-block"><img class="shape-1"
@@ -71,11 +71,11 @@ export default {
 
             axios.post('/api/login', loginData, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 }
             })
                 .then(response => {
-                    console.log(response.data);
+                    console.log(response.data.message);
                     // if(response.data.message === "Post created successfully"){
                     //     location.reload();
                     // }
